@@ -13,7 +13,6 @@
 
 
 import collections
-import itertools
 import os
 import shutil
 import subprocess
@@ -21,11 +20,6 @@ import tempfile
 import xml.sax.handler
 import xml.sax.saxutils
 import xml.sax.xmlreader
-
-
-def get_center(bottomleft, size):
-    coord_size_pairs = itertools.zip_longest(bottomleft, size, fillvalue=0)
-    return tuple(coord + size / 2 for coord, size in coord_size_pairs)
 
 
 def transform(source, layers):
@@ -69,10 +63,9 @@ def pngize(source, destination):
 
 class Transformations:
 
-    def __init__(self, png_fn=None, rotation_angle=0, rotation_center=(0, 0)):
+    def __init__(self, png_fn=None, rotation=0):
         self.png_fn = png_fn
-        self.rotation_angle = rotation_angle
-        self.rotation_center = rotation_center
+        self.rotation = rotation
 
 
 class RotatedRootGroupsXMLGenerator(xml.sax.saxutils.XMLGenerator):
@@ -83,7 +76,7 @@ class RotatedRootGroupsXMLGenerator(xml.sax.saxutils.XMLGenerator):
 
     ATTRIBUTE_QNAME = 'transform'
 
-    ATTRIBUTE_VALUE = 'rotate({0.rotation_angle} {0.rotation_center[0]} {0.rotation_center[1]})'
+    ATTRIBUTE_VALUE = 'rotate({0.rotation})'
 
     def __init__(self, root_groups, out):
         super().__init__(out, 'utf-8', short_empty_elements=True)
@@ -120,12 +113,10 @@ class RotatedRootGroupsXMLGenerator(xml.sax.saxutils.XMLGenerator):
 
 
 if __name__ == '__main__':
-    top = 1052.3622047
-
     alitrunk = Transformations('body.png')
     alitrunk_stripes = Transformations('body.png')
     antenna_left = Transformations()
-    antenna_right = Transformations('antenna.png', -40, get_center((392.748, top - 941.749), (228.076, -88.644)))
+    antenna_right = Transformations('antenna.png', -40)
     eye_left = Transformations('body.png')
     eye_right = Transformations('body.png')
     femur_left_hind = Transformations()
@@ -133,13 +124,13 @@ if __name__ == '__main__':
     femur_left_front = Transformations()
     femur_right_front = Transformations()
     femur_right_hind = Transformations()
-    femur_right_middle = Transformations('femur.png', -58, get_center((279.895, top - 350.843), (112.353, -74.029)))
+    femur_right_middle = Transformations('femur.png', -58)
     head = Transformations('body.png')
     gaster = Transformations('body.png')
     tibia_left_hind = Transformations('tibia_left_hind.png')
     tibia_left_middle = Transformations('tibia_left_middle.png')
     tibia_left_front = Transformations()
-    tibia_right_front = Transformations('tibia_front.png', -135, get_center((89,306, top - 603,531), (134,195, -135,278)))
+    tibia_right_front = Transformations('tibia_front.png', -135)
     tibia_right_hind = Transformations('tibia_right_hind.png')
     tibia_right_middle = Transformations('tibia_right_middle.png')
 
